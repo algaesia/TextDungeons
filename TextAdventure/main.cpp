@@ -17,6 +17,11 @@ void main()
 
 	Player player = Player(playerName.c_str(), Dungeon::Instance().GetStartingRoom()->GetID());
 
+	if (Dungeon::Instance().GetStartingRoom() == nullptr)
+	{
+		return;
+	}
+
 	playerName = CustomString("Welcome ") + playerName;
 	playerName.WriteToConsole();
 
@@ -31,6 +36,7 @@ void main()
 		if (currentRoom != nullptr)
 		{
 			currentRoom->PrintDescription();
+			currentRoom->ProcessItemSelection(&player);
 			currentRoom->ProcessInput(&player);
 		}
 	}

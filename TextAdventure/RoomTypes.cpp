@@ -1,6 +1,7 @@
 #include "RoomTypes.h"
 #include "RandNum.h"
 #include "Dungeon.h"
+#include <string>
 
 EmptyRoom::EmptyRoom()
 	: Room("This is a boring empty room.",
@@ -26,7 +27,6 @@ void RiddleRoom::ProcessInput(Player* a_Player)
 	if (!defeated)
 	{
 		m_RoomQuestion.ReadFromConsole("What loses its head in the morning and gets it back at night?");
-		m_RoomQuestion.ToLower();
 
 		if (m_RoomQuestion == "pillow" ||
 			m_RoomQuestion == "a pillow")
@@ -68,7 +68,6 @@ void BossRoom::ProcessInput(Player* a_Player)
 	{
 		visited = true;
 		m_RoomQuestion.ReadFromConsole("There are seven deadly sins. One of them is this beast's flaw.");
-		m_RoomQuestion.ToLower();
 
 		if (m_RoomQuestion == strings[chosenNum])
 		{
@@ -141,8 +140,8 @@ void TreasureRoom::ProcessInput(Player* a_Player)
 }
 
 MonsterRoom::MonsterRoom()
-	: Room("Hostile creatures on all sides, trapped.",
-	       "The creatures are still there, waiting for an unassuming passer-by.")
+	: Room("Hostile creatures on all sides, trapped, behind bars.",
+	       "The creatures are still there, reaching out for an unassuming passer-by.")
 {
 
 }
@@ -162,8 +161,24 @@ VistaRoom::VistaRoom()
 
 void VistaRoom::ProcessInput(Player* a_Player)
 {
+	m_RoomQuestion.ReadFromConsole("You stand there, in solitude, staring into the distance. Where to next?");
+
 	visited = true;
-	Room::ProcessInput(a_Player);
+
+	if (m_RoomQuestion == "jump")
+	{
+		m_RoomQuestion = "You take a leap of faith, into the abyss, clouds swallowing you up...\n\n\n\n\nYou wake up somewhere strangely familiar.";
+		m_RoomQuestion.WriteToConsole();
+		Dungeon::Instance().ResetDungeon();
+		a_Player->SetCurrentPosition(Dungeon::Instance().GetStartingRoom()->GetID());
+	}
+	else
+	{
+		m_RoomQuestion = "You decide, instead, to move away from the ledge and continue on with the dungeon at hand.";
+		m_RoomQuestion.WriteToConsole();
+
+		Room::ProcessInput(a_Player);
+	}
 }
 
 EntranceRoom::EntranceRoom()
@@ -189,12 +204,15 @@ ExitRoom::ExitRoom()
 void ExitRoom::ProcessInput(Player* a_Player)
 {
 	m_RoomQuestion.ReadFromConsole("The dungeon has come to an end. Would you like to start over?");
-	m_RoomQuestion.ToLower();
 
 	if (m_RoomQuestion == "no")
 	{
 		//quit game
 		Dungeon::Instance().SetDungeonFinished(true);
+
+		int score = a_Player->GetTotalScore();
+		CustomString finalScore = CustomString("Final score is: ") + CustomString(std::to_string(score).c_str());
+		finalScore.WriteToConsole();
 		return;
 	}
 	else if (m_RoomQuestion == "yes")
@@ -220,8 +238,24 @@ DeadEndRoom::DeadEndRoom()
 
 void DeadEndRoom::ProcessInput(Player* a_Player)
 {
+	m_RoomQuestion.ReadFromConsole("You stare at the enclosed walls, annoyed at the dead-endedness, how will you express your frustration?");
+
 	visited = true;
-	Room::ProcessInput(a_Player);
+
+	if (m_RoomQuestion == "punch" || m_RoomQuestion == "kick" || m_RoomQuestion == "punch the wall" || m_RoomQuestion == "kick the wall")
+	{
+		m_RoomQuestion = "You've uncovered the secret exit, making short work of the dungeon and returning hastily to the surface.";
+		m_RoomQuestion.WriteToConsole();
+
+		Dungeon::Instance().SetDungeonFinished(true);
+	}
+	else
+	{
+		m_RoomQuestion = "You failed to make any impressionable difference to the walls.";
+		m_RoomQuestion.WriteToConsole();
+
+		Room::ProcessInput(a_Player);
+	}
 }
 
 NextLevelRoom::NextLevelRoom()
@@ -234,7 +268,6 @@ NextLevelRoom::NextLevelRoom()
 void NextLevelRoom::ProcessInput(Player* a_Player)
 {
 	m_RoomQuestion.ReadFromConsole("This leads to a new area of the dungeon, where exactly it leads is unclear. Proceed further?");
-	m_RoomQuestion.ToLower();
 
 	if (m_RoomQuestion == "no")
 	{

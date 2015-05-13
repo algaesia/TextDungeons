@@ -11,10 +11,14 @@ Player::Player(const char* a_Name, int a_StartingPos)
 	m_CurrentInstruction = CustomString(" ");
 }
 
+void Player::AddItem(ItemType a_Type)
+{
+	m_Items.push_back(Item(a_Type));
+}
+
 bool Player::UpdateInstruction()
 {
 	m_CurrentInstruction.ReadFromConsole("Which direction to go in?");
-	m_CurrentInstruction.ToLower();
 
 	return ParseInstruction();
 }
@@ -44,6 +48,11 @@ bool Player::ParseInstruction()
 		Dungeon::Instance().SetDungeonFinished(true);
 		return true;
 	}
+	else if (m_CurrentInstruction == "print items" || m_CurrentInstruction == "print")
+	{
+		PrintItems();
+		return true;
+	}
 
 	if (t != nullptr)
 	{
@@ -65,4 +74,26 @@ const int Player::GetCurrentPosition() const
 void Player::SetCurrentPosition(int a_Position)
 {
 	m_Position = a_Position;
+}
+
+void Player::PrintItems() const
+{
+	CustomString line = "You currently have: ";
+	line.WriteToConsole();
+
+	for (const auto& i : m_Items)
+	{
+		i.Print();
+	}
+}
+
+int Player::GetTotalScore() const
+{
+	int sum = 0;
+	for (const auto& i : m_Items)
+	{
+		sum += i.GetScoreValue();
+	}
+
+	return sum;
 }

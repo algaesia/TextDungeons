@@ -336,10 +336,12 @@ void Dungeon::FillPreRooms()
 			{
 				double n = RandNum::Instance().GetRandNum();
 
-				if (n > 0.75)
+				if (n < 0.25)
 					i->roomType = VISTA;
-				else
+				else if (n >= 0.25 && n < 0.5)
 					i->roomType = MONSTER;
+				else
+					i->roomType = TREASURE;
 			}
 			else if (i->NumConnections() == 3)
 			{
@@ -354,9 +356,9 @@ void Dungeon::FillPreRooms()
 			{
 				double n = RandNum::Instance().GetRandNum();
 
-				if (n >= 0 && n < 0.25)
+				if (n < 0.5)
 					i->roomType = TREASURE;
-				else if (n >= 0.25 && n < 0.5)
+				else if (n >= 0.5 && n < 0.75)
 					i->roomType = RIDDLE;
 				else if (n > 0.9)
 					i->roomType = BOSS;

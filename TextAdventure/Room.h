@@ -1,8 +1,10 @@
 #ifndef _ROOM_H
 #define _ROOM_H
 
+#include <vector>
 #include "include\CustomString.h"
 #include "Player.h"
+#include "Item.h"
 
 enum Direction
 {
@@ -34,8 +36,15 @@ public:
 	void ClearConnections();
 	void PrintDescription() const;
 
+	void ProcessItemSelection(Player* a_Player);
+
 	virtual void ProcessInput(Player* a_Player);
 	static void ResetStaticID();
+
+	void RemoveTakenItems();
+
+	void PrintItems() const;
+	const unsigned int GetNumItems() const;
 protected:
 	bool visited;
 	bool defeated;
@@ -49,8 +58,12 @@ protected:
 	CustomString m_RoomAltDescription;
 	CustomString m_RoomQuestion;
 
+	int m_MaxItems;
+	std::vector<Item> m_Items;
+
 	int m_ID;
 
+	void GenerateItems();
 private:
 	static int ID;
 };
